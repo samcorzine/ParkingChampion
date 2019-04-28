@@ -5,7 +5,11 @@ import (
   "time"
   "strings"
   "strconv"
+  "sync"
+  "errors"
 )
+
+var validDays = [...]string {"sun", "mon", "tues", "wed", "thurs", "fri", "sat"}
 
 type Rate struct {
 	Days         string `json:"days"`
@@ -16,12 +20,53 @@ type Rate struct {
 
 type RateList struct {
   Rates       []Rate `json:"rates"`
+  sync.Mutex
 }
 
 type RateQuery struct {
   startTime   time.Time
   endTime     time.Time
 }
+
+
+func dayInValidDays(day string) bool {
+    for _, b := range validDays {
+        if b == day {
+            return true
+        }
+    }
+    return false
+}
+
+
+
+func (rateList *RateList) update(newRates *RateList) error {
+  for _, x := range newRates.Rates {
+    if !x.validate(){
+      return errors.New("New rates contains an invalid rate")
+    }
+  }
+  rateList = newRates
+  return nil
+}
+
+func (rate Rate) validate() bool {
+  _, err := time.LoadLocation(rate.TimeZone)
+  if err != nil {
+    return false
+  }
+  for _, day := range strings.Split(rate.Days, ",") {
+    if !dayInValidDays(day) {
+      return false
+    }
+  }
+  if rate.Price < 0 {
+    return false
+  }
+  return true
+}
+
+
 
 func timeFromMil(queryTime time.Time, milTime string, tz string) time.Time {
   y, m, d := queryTime.Date()

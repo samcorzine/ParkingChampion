@@ -6,7 +6,7 @@ ENV GO111MODULE=on
 RUN go mod download
 COPY src/ /ParkingChamp
 #testing
-COPY testing.json /testing.json
+COPY testfiles /testfiles
 RUN go test
 RUN CGO_ENABLED=0 GOOS=linux go build -o /parking
 

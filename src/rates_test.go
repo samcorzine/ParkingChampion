@@ -4,17 +4,13 @@ import (
 	"testing"
   "github.com/stretchr/testify/assert"
   "os"
-  "fmt"
   "encoding/json"
   "io/ioutil"
   "time"
 )
 
 func TestGetRate(t *testing.T) {
-  rateFile, err := os.Open("/testing.json")
-  if err != nil {
-    fmt.Println(err)
-  }
+  rateFile, _ := os.Open("/testfiles/testing.json")
   defer rateFile.Close()
   byteValue, _ := ioutil.ReadAll(rateFile)
   var theRates RateList
@@ -51,4 +47,21 @@ func TestQueryValidation(t *testing.T) {
   t4, _ := time.Parse(time.RFC3339, "2015-07-01T12:00:00-05:00")
   rq2 := RateQuery{startTime: t3, endTime: t4}
   assert.False(t, rq2.validate())
+}
+
+
+func TestRateValidation(t *testing.T) {
+	r1 := Rate{Days: "wed", Times: "0900-1200", TimeZone: "America/Chicago", Price: 500}
+	v1 := r1.validate()
+	assert.True(t, v1)
+	r2 := Rate{Days: "wed", Times: "0900-1200", TimeZone: "America/Chigo", Price: 500}
+	v2 := r2.validate()
+	assert.False(t, v2)
+	r3 := Rate{Days: "wed", Times: "0900-1200", TimeZone: "America/Chicago", Price: -1}
+	v3 := r3.validate()
+	assert.False(t, v3)
+	r4 := Rate{Days: "tuesday", Times: "0900-1200", TimeZone: "America/Chicago", Price: 500}
+	v4 := r4.validate()
+	assert.False(t, v4)
+
 }

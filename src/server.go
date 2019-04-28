@@ -6,7 +6,6 @@ import (
   "encoding/json"
   "time"
 	"strconv"
-
 	"github.com/gorilla/mux"
 	"github.com/opentracing/opentracing-go"
 	"github.com/spothero/tools/service"
@@ -50,9 +49,20 @@ func setRates(w http.ResponseWriter, r *http.Request) {
 	span = span.SetTag("best.language", "golang")
 	span = span.SetTag("best.mascot", "gopher")
 	defer span.Finish()
-  _ = json.NewDecoder(r.Body).Decode(&theRates)
-  js, _ := json.Marshal(theRates)
-	w.Write(js)
+	validRequest  := true
+	var newRates RateList
+  _ = json.NewDecoder(r.Body).Decode(&newRates)
+	err := theRates.update(&newRates)
+	if err != nil {
+		validRequest = false
+	}
+	if validRequest {
+		js, _ := json.Marshal(theRates)
+		w.Write(js)
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("One of the provided rates was invalid, update aborted"))
+	}
 }
 
 // getRate returns a rate for any valid
