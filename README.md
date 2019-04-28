@@ -2,13 +2,12 @@
 
 Parking Champion is an api desigined to allow the storage and query of parking rates. The set of current rates can be updated and queried via a RESTful endpoint, and users can find the applicable rate for given starting and end times via a getRate endpoint.
 
-#### Running the server
+#### Running the API
 
 1. Make sure docker is properly installed `https://docs.docker.com/install/`
 2. Clone the repo
 3. cd into cloned directory
 4. `docker build -t parking . && docker run --rm -p 8080:8080 parking`
-5. Open your browser to `http://localhost:8080`
 
 ### Usage
 
