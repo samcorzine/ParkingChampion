@@ -71,7 +71,7 @@ paths:
         '200':
           description: OK
           examples:
-            application/json: {"rate":1750}
+            application/json: {"rate":"1750"}
 definitions:
   Rates:
     type: "object"

@@ -19,6 +19,7 @@ import (
 	"os"
   "encoding/json"
   "time"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/opentracing/opentracing-go"
@@ -36,13 +37,13 @@ var theRates RateList
 // NOTE: The HTTP server automatically registers /health and /metrics -- Have a look in your
 // browser!
 func registerHandlers(router *mux.Router) {
-	router.HandleFunc("/rate", getRates).Methods("GET")
-	router.HandleFunc("/rate", setRates).Methods("POST")
+	router.HandleFunc("/rates", getRates).Methods("GET")
+	router.HandleFunc("/rates", setRates).Methods("POST")
   router.HandleFunc("/getRate", getRate).Methods("GET")
 }
 
 type RateResponse struct {
-	Rate         int `json:"rate"`
+	Rate         string `json:"rate"`
 }
 
 // rates return json formatted rates for parking
@@ -59,7 +60,7 @@ func getRates(w http.ResponseWriter, r *http.Request) {
 // rates return json formatted rates for parking
 func setRates(w http.ResponseWriter, r *http.Request) {
 	// NOTE: This is an example of an opentracing span
-	span, _ := opentracing.StartSpanFromContext(r.Context(), "set-rate")
+	span, _ := opentracing.StartSpanFromContext(r.Context(), "set-rates")
 	span = span.SetTag("best.language", "golang")
 	span = span.SetTag("best.mascot", "gopher")
 	defer span.Finish()
@@ -82,8 +83,13 @@ func getRate(w http.ResponseWriter, r *http.Request) {
   endT, _ := time.Parse(time.RFC3339, endString)
   rq := RateQuery{startTime: startT, endTime: endT}
   rate := theRates.getRate(rq)
-  rateResponse := RateResponse{Rate:rate}
-  js, _ := json.Marshal(rateResponse)
+	var resp RateResponse
+	if rate == -1 {
+		resp.Rate = "unavailable"
+	} else {
+		resp.Rate = strconv.Itoa(rate)
+	}
+  js, _ := json.Marshal(resp)
   w.Write(js)
 }
 

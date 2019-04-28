@@ -1,6 +1,6 @@
 # Parking Champion
 
-Parking Champion is an api desigined to allow the storage and query of parking rates. The set of current rates can be updated and queried via a RESTful endpoint, and users can find the applicable rate for given starting and end times via a getRate endpoint.
+Parking Champion is an api designed to allow the storage and query of parking rates. The set of current rates can be updated and queried via a RESTful endpoint, and users can find the applicable rate for given starting and end times via a getRate endpoint.
 
 #### Running the API
 
