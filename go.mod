@@ -1,5 +1,5 @@
 
-module MultiStage
+module ParkingChamp
 
 go 1.12
 

@@ -83,6 +83,9 @@ func (rate *Rate) timeMatch(rq RateQuery) bool {
 }
 
 func (rateList *RateList) getRate(rq RateQuery) int {
+  if !rq.validate() {
+    return -1
+  }
   for _, x := range rateList.Rates {
     if x.timeMatch(rq) {
       return x.Price

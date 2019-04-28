@@ -3,9 +3,6 @@ info:
   description: "API for querying parking rates"
   version: "1.0.0"
   title: "ParkingChampion"
-  license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
 tags:
 - name: "rates"
   description: "Get and set the current parking rate structure"
@@ -61,12 +58,13 @@ paths:
           name: start
           type: string
           required: true
-          description: Timestamp that specifies the desired beginning parking time
+          description: Timestamp that specifies the desired beginning parking time (ex. 2015-07-04T15:00:00+00:00)
         - in: query
           name: end
           type: string
           required: true
           description: Timestamp that specifies the desired end parking time
+            (ex. 2015-07-04T20:00:00+00:00)
       responses:
         '200':
           description: OK
@@ -101,6 +99,3 @@ definitions:
       tz:
         type: "string"
         example: "America/Chicago"
-externalDocs:
-  description: "Find out more about Swagger"
-  url: "http://swagger.io"

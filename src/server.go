@@ -1,17 +1,3 @@
-// Copyright 2019 SpotHero
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package main
 
 import (
@@ -77,20 +63,32 @@ func getRate(w http.ResponseWriter, r *http.Request) {
 	span = span.SetTag("best.mascot", "gopher")
 	defer span.Finish()
   keys := r.URL.Query()
+	validRequest  := true
   startString := keys.Get("start")
   endString := keys.Get("end")
-  startT, _ := time.Parse(time.RFC3339, startString)
-  endT, _ := time.Parse(time.RFC3339, endString)
-  rq := RateQuery{startTime: startT, endTime: endT}
-  rate := theRates.getRate(rq)
-	var resp RateResponse
-	if rate == -1 {
-		resp.Rate = "unavailable"
-	} else {
-		resp.Rate = strconv.Itoa(rate)
+  startT, startErr := time.Parse(time.RFC3339, startString)
+	if startErr != nil {
+		validRequest = false
 	}
-  js, _ := json.Marshal(resp)
-  w.Write(js)
+  endT, endErr := time.Parse(time.RFC3339, endString)
+	if endErr != nil {
+		validRequest = false
+	}
+	if validRequest {
+	  rq := RateQuery{startTime: startT, endTime: endT}
+	  rate := theRates.getRate(rq)
+		var resp RateResponse
+		if rate == -1 {
+			resp.Rate = "unavailable"
+		} else {
+			resp.Rate = strconv.Itoa(rate)
+		}
+	  js, _ := json.Marshal(resp)
+	  w.Write(js)
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Start/End times either were not provided or were invalid "))
+	}
 }
 
 // This is the main entrypoint of the program. Here we create our root command and then execute it.

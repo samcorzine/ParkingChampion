@@ -1,13 +1,14 @@
 #first stage - builder
 FROM golang:1.12.0-stretch as builder
-COPY src/ /MultiStage
-COPY go.mod /MultiStage
-WORKDIR /MultiStage
+COPY go.mod /ParkingChamp/
+WORKDIR /ParkingChamp
 ENV GO111MODULE=on
 RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -o /parking
+COPY src/ /ParkingChamp
+#testing
 COPY testing.json /testing.json
 RUN go test
+RUN CGO_ENABLED=0 GOOS=linux go build -o /parking
 
 #second stage
 FROM scratch
