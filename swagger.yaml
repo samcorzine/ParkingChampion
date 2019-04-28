@@ -1,0 +1,106 @@
+swagger: "2.0"
+info:
+  description: "API for querying parking rates"
+  version: "1.0.0"
+  title: "ParkingChampion"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+tags:
+- name: "rates"
+  description: "Get and set the current parking rate structure"
+- name: "quotes"
+  description: "Get a parking rate for a specific start and end time"
+schemes:
+- "http"
+paths:
+  /rates:
+    post:
+      tags:
+      - "rates"
+      summary: "Set the current parking rates"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Pet object that needs to be added to the store"
+        required: true
+        schema:
+          $ref: "#/definitions/Rates"
+      responses:
+        405:
+          description: "Invalid input"
+    get:
+      tags:
+        - "rates"
+      summary: "Get the current parking rates"
+      responses:
+        '200':
+          description: OK
+          examples:
+            application/json: {
+              "rates": [
+                {
+                  "price": "1000",
+                  "days": "mon,tues,thurs",
+                  "times": "0900-2100",
+                  "tz": "America/Chicago"
+                }
+              ]
+            }
+  /getRate:
+    get:
+      tags:
+        - "quotes"
+      summary: "Get the applicable parking rate"
+      parameters:
+        - in: query
+          name: start
+          type: string
+          required: true
+          description: Timestamp that specifies the desired beginning parking time
+        - in: query
+          name: end
+          type: string
+          required: true
+          description: Timestamp that specifies the desired end parking time
+      responses:
+        '200':
+          description: OK
+          examples:
+            application/json: {"rate":1750}
+definitions:
+  Rates:
+    type: "object"
+    required:
+    - "name"
+    - "photoUrls"
+    properties:
+      rates:
+        type: "array"
+        xml:
+          name: "tag"
+          wrapped: true
+        items:
+          $ref: "#/definitions/Rate"
+  Rate:
+    type: "object"
+    properties:
+      price:
+        type: "integer"
+        example: "1000"
+      days:
+        type: "string"
+        example: "mon,tues,thurs"
+      times:
+        type: "string"
+        example: "0900-2100"
+      tz:
+        type: "string"
+        example: "America/Chicago"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
