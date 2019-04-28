@@ -23,6 +23,15 @@ type RateQuery struct {
   endTime     time.Time
 }
 
+func timeFromMil(queryTime time.Time, milTime string, tz string) time.Time {
+  y, m, d := queryTime.Date()
+  milHour, _ := strconv.Atoi(milTime[:2])
+  milMinute, _ := strconv.Atoi(milTime[2:])
+  location, _ := time.LoadLocation(tz)
+  theTime := time.Date(y, m, d, milHour, milMinute, 0, 0, location)
+  return theTime
+}
+
 func (rate *Rate) timeMatch(rq RateQuery) bool {
   start := rq.startTime
   end := rq.endTime
@@ -54,28 +63,10 @@ func (rate *Rate) timeMatch(rq RateQuery) bool {
     if int(start.Weekday()) == x {
       rateTimeRange := rate.Times
       rateTimes := strings.Split(rateTimeRange, "-")
-      beginningR := rateTimes[0]
-      endR := rateTimes[1]
-      beginningHour, _ := strconv.Atoi(beginningR[:2])
-      beginningMinute, _ := strconv.Atoi(beginningR[2:])
-      endHour, _ := strconv.Atoi(endR[:2])
-      endMinute, _ := strconv.Atoi(endR[2:])
-      // TODO fix seconds logic
-      if start.Hour() > beginningHour {
-        if end.Hour() < endHour {
-          return true
-        }
-        if end.Hour() == endHour && end.Minute() <= endMinute {
-          return true
-        }
-      }
-      if start.Hour() == beginningHour && start.Minute() >= beginningMinute {
-        if end.Hour() < endHour {
-          return true
-        }
-        if end.Hour() == endHour && end.Minute() <= endMinute {
-          return true
-        }
+      beginTimeRange := timeFromMil(start, rateTimes[0], rate.TimeZone)
+      endTimeRange := timeFromMil(start, rateTimes[1], rate.TimeZone)
+      if start.After(beginTimeRange) && end.Before(endTimeRange) {
+        return true
       }
     }
   }
