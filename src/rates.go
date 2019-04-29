@@ -10,6 +10,15 @@ import (
 )
 
 var validDays = [...]string {"sun", "mon", "tues", "wed", "thurs", "fri", "sat"}
+var dayIntMap = map[string]int{
+   "sun"  : 0,
+   "mon"  : 1,
+   "tues" : 2,
+   "wed"  : 3,
+   "thurs": 4,
+   "fri"  : 5,
+   "sat"  : 6,
+ }
 
 type Rate struct {
 	Days         string `json:"days"`
@@ -42,11 +51,11 @@ func dayInValidDays(day string) bool {
 
 func (rateList *RateList) update(newRates *RateList) error {
   for _, x := range newRates.Rates {
-    if !x.validate(){
+    if !x.validate() {
       return errors.New("New rates contains an invalid rate")
     }
   }
-  rateList = newRates
+  rateList.Rates = newRates.Rates
   return nil
 }
 
@@ -66,8 +75,6 @@ func (rate Rate) validate() bool {
   return true
 }
 
-
-
 func timeFromMil(queryTime time.Time, milTime string, tz string) time.Time {
   y, m, d := queryTime.Date()
   milHour, _ := strconv.Atoi(milTime[:2])
@@ -82,26 +89,9 @@ func (rate *Rate) timeMatch(rq RateQuery) bool {
   end := rq.endTime
   days := strings.Split(rate.Days, ",")
   var daysAsInts []int
-  for _, x := range days {
-    day := -1
-    switch x {
-      case "sun":
-        day = 0
-      case "mon":
-        day = 1
-      case "tues":
-        day = 2
-      case "wed":
-        day = 3
-      case "thurs":
-        day = 4
-      case "fri":
-        day = 5
-      case "sat":
-        day = 6
-    }
-    if day != -1 {
-      daysAsInts = append(daysAsInts, day)
+  for _, day:= range days {
+    if dayInValidDays(day) {
+      daysAsInts = append(daysAsInts, dayIntMap[day])
     }
   }
   for _, x := range daysAsInts {

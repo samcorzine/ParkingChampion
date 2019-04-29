@@ -63,5 +63,18 @@ func TestRateValidation(t *testing.T) {
 	r4 := Rate{Days: "tuesday", Times: "0900-1200", TimeZone: "America/Chicago", Price: 500}
 	v4 := r4.validate()
 	assert.False(t, v4)
+}
 
+func TestRateListUpdate(t *testing.T) {
+	var theRates RateList
+	rateFile, _ := os.Open("/testfiles/testing.json")
+	defer rateFile.Close()
+	byteValue, _ := ioutil.ReadAll(rateFile)
+	var theNewRates RateList
+	json.Unmarshal(byteValue, &theNewRates)
+	theRates.update(&theNewRates)
+	t1, _ := time.Parse(time.RFC3339, "2015-07-01T07:00:00-05:00")
+  t2, _ := time.Parse(time.RFC3339, "2015-07-01T12:00:00-05:00")
+  rq := RateQuery{startTime: t1, endTime: t2}
+  assert.Equal(t, 1750, theRates.getRate(rq))
 }

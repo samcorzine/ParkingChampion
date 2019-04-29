@@ -23,19 +23,19 @@ paths:
       parameters:
       - in: "body"
         name: "body"
-        description: "Pet object that needs to be added to the store"
+        description: "New rates"
         required: true
         schema:
           $ref: "#/definitions/Rates"
       responses:
-        405:
-          description: "Invalid input"
+        400:
+          description: "One of the provided rates was invalid"
     get:
       tags:
         - "rates"
       summary: "Get the current parking rates"
       responses:
-        '200':
+        200:
           description: OK
           examples:
             application/json: {
@@ -66,10 +66,12 @@ paths:
           description: Timestamp that specifies the desired end parking time
             (ex. 2015-07-04T20:00:00+00:00)
       responses:
-        '200':
+        200:
           description: OK
           examples:
             application/json: {"rate":"1750"}
+        400:
+          description: "Start/End times either were not provided or were invalid"
 definitions:
   Rates:
     type: "object"
