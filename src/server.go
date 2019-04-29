@@ -1,14 +1,14 @@
 package main
 
 import (
-	"net/http"
-	"os"
-  "encoding/json"
-  "time"
-	"strconv"
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/opentracing/opentracing-go"
 	"github.com/spothero/tools/service"
+	"net/http"
+	"os"
+	"strconv"
+	"time"
 )
 
 var gitSHA = "not-set"
@@ -18,11 +18,11 @@ var theRates RateList
 func registerHandlers(router *mux.Router) {
 	router.HandleFunc("/rates", getRates).Methods("GET")
 	router.HandleFunc("/rates", setRates).Methods("POST")
-  router.HandleFunc("/getRate", getRate).Methods("GET")
+	router.HandleFunc("/getRate", getRate).Methods("GET")
 }
 
 type RateResponse struct {
-	Rate         string `json:"rate"`
+	Rate string `json:"rate"`
 }
 
 // rates return json formatted rates for parking
@@ -30,7 +30,7 @@ func getRates(w http.ResponseWriter, r *http.Request) {
 	span, _ := opentracing.StartSpanFromContext(r.Context(), "get-rates")
 	span = span.SetTag("should.hireSam", "most-definitely")
 	defer span.Finish()
-  js, _ := json.Marshal(theRates)
+	js, _ := json.Marshal(theRates)
 	w.Write(js)
 }
 
@@ -39,9 +39,9 @@ func setRates(w http.ResponseWriter, r *http.Request) {
 	span, _ := opentracing.StartSpanFromContext(r.Context(), "set-rates")
 	span = span.SetTag("should.hireSam", "most-definitely")
 	defer span.Finish()
-	validRequest  := true
+	validRequest := true
 	var newRates RateList
-  _ = json.NewDecoder(r.Body).Decode(&newRates)
+	_ = json.NewDecoder(r.Body).Decode(&newRates)
 	err := theRates.update(&newRates)
 	if err != nil {
 		validRequest = false
@@ -59,29 +59,29 @@ func getRate(w http.ResponseWriter, r *http.Request) {
 	span, _ := opentracing.StartSpanFromContext(r.Context(), "get-rate")
 	span = span.SetTag("should.hireSam", "most-definitely")
 	defer span.Finish()
-  keys := r.URL.Query()
-	validRequest  := true
-  startString := keys.Get("start")
-  endString := keys.Get("end")
-  startT, startErr := time.Parse(time.RFC3339, startString)
+	keys := r.URL.Query()
+	validRequest := true
+	startString := keys.Get("start")
+	endString := keys.Get("end")
+	startT, startErr := time.Parse(time.RFC3339, startString)
 	if startErr != nil {
 		validRequest = false
 	}
-  endT, endErr := time.Parse(time.RFC3339, endString)
+	endT, endErr := time.Parse(time.RFC3339, endString)
 	if endErr != nil {
 		validRequest = false
 	}
 	if validRequest {
-	  rq := RateQuery{startTime: startT, endTime: endT}
-	  rate := theRates.getRate(rq)
+		rq := RateQuery{startTime: startT, endTime: endT}
+		rate := theRates.getRate(rq)
 		var resp RateResponse
 		if rate == -1 {
 			resp.Rate = "unavailable"
 		} else {
 			resp.Rate = strconv.Itoa(rate)
 		}
-	  js, _ := json.Marshal(resp)
-	  w.Write(js)
+		js, _ := json.Marshal(resp)
+		w.Write(js)
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Start/End times either were not provided or were invalid"))
