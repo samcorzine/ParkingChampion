@@ -13,7 +13,7 @@ Parking Champion is an api designed to allow the storage and query of parking ra
 
 API will be initialized with no rates, so first off you'll want to post a valid rates document to the /rates endpoint. Feel free to use the one stored at testing/testing.json. The following curl command will do the intitial post for you if run from the top-level directory of the cloned repo.
 
-`curl -i -X POST localhost:8080/rates -H "Content-Type: text/json" --data "@testfiles/testing.json""`
+`curl -i -X POST localhost:8080/rates -H "Content-Type: text/json" --data "@testfiles/testing.json"`
 
 From there rates can be queried via the getRate endpoint.
 
