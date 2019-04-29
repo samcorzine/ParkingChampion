@@ -75,15 +75,9 @@ paths:
 definitions:
   Rates:
     type: "object"
-    required:
-    - "name"
-    - "photoUrls"
     properties:
       rates:
         type: "array"
-        xml:
-          name: "tag"
-          wrapped: true
         items:
           $ref: "#/definitions/Rate"
   Rate:
