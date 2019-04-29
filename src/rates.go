@@ -8,7 +8,7 @@ import (
   "sync"
   "errors"
 )
-
+// valid formats for day strings, as well as their associated integer representations in golang
 var validDays = [...]string {"sun", "mon", "tues", "wed", "thurs", "fri", "sat"}
 var dayIntMap = map[string]int{
    "sun"  : 0,
@@ -37,7 +37,7 @@ type RateQuery struct {
   endTime     time.Time
 }
 
-
+// checks if a day string is one of the accepted representations
 func dayInValidDays(day string) bool {
     for _, b := range validDays {
         if b == day {
@@ -47,8 +47,7 @@ func dayInValidDays(day string) bool {
     return false
 }
 
-
-
+// Updates a ratelist to the rates in the argument ratelist
 func (rateList *RateList) update(newRates *RateList) error {
   for _, x := range newRates.Rates {
     if !x.validate() {
@@ -59,6 +58,10 @@ func (rateList *RateList) update(newRates *RateList) error {
   return nil
 }
 
+// validates that a rate has acceptable values
+// Timezone is valid in golang
+// Days are valid to this api's conventions
+// Price is positive
 func (rate Rate) validate() bool {
   _, err := time.LoadLocation(rate.TimeZone)
   if err != nil {
@@ -75,6 +78,7 @@ func (rate Rate) validate() bool {
   return true
 }
 
+// Takes the times formatted in "military time" from the rate ranges and translates them to time structs on the query day
 func timeFromMil(queryTime time.Time, milTime string, tz string) time.Time {
   y, m, d := queryTime.Date()
   milHour, _ := strconv.Atoi(milTime[:2])
@@ -84,6 +88,7 @@ func timeFromMil(queryTime time.Time, milTime string, tz string) time.Time {
   return theTime
 }
 
+// Checks if start and end times fall inside a rate's range
 func (rate *Rate) timeMatch(rq RateQuery) bool {
   start := rq.startTime
   end := rq.endTime
@@ -108,6 +113,7 @@ func (rate *Rate) timeMatch(rq RateQuery) bool {
   return false
 }
 
+// Get's the applicable rate for a time, returns -1 no rates apply
 func (rateList *RateList) getRate(rq RateQuery) int {
   if !rq.validate() {
     return -1
@@ -120,6 +126,7 @@ func (rateList *RateList) getRate(rq RateQuery) int {
   return -1
 }
 
+// Validates that a RateQuery's start and end are the same date
 func (rq *RateQuery) validate() bool {
   y0, m0, d0 := rq.startTime.Date()
   y1, m1, d1 := rq.endTime.Date()
