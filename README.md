@@ -23,5 +23,5 @@ Endpoints are fully documented in the swagger.yaml file.
 
 ### Metrics
 
-Metrics are exposed at /metrics, courtesy of the spothero tools library.
+Metrics are exposed at /metrics, courtesy of the SpotHero Tools Library for Go.
 `https://github.com/spothero/tools`
