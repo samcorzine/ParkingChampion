@@ -20,3 +20,8 @@ From there rates can be queried via the getRate endpoint.
 `curl "localhost:8080/getRate?start=2015-07-01T07:00:00-05:00&end=2015-07-01T12:00:00-05:00"`
 
 Endpoints are fully documented in the swagger.yaml file.
+
+### Metrics
+
+Metrics are exposed at /metrics, courtesy of the spothero tools library.
+`https://github.com/spothero/tools`
